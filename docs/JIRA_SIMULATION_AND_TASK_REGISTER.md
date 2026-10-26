@@ -10,7 +10,7 @@
 
 ```
 =======================================================================================================================================
-|  1. BACKLOG (6 pts)    |  2. TO DO (5 pts)       |  3. IN PROGRESS (11 pts) |  4. CODE REVIEW (11 pts)|  5. QA TESTING (8 pts) |  6. DONE (41 pts)     |
+|  1. BACKLOG (6 pts)    |  2. TO DO (10 pts)       |  3. IN PROGRESS (11 pts) |  4. CODE REVIEW (11 pts)|  5. QA TESTING (8 pts) |  6. DONE (41 pts)     |
 =======================================================================================================================================
 | [SACCO-124]            | [SACCO-125]             | [SACCO-110]              | [SACCO-113]             | [SACCO-120]            | [SACCO-101]           |
 | Production Docker      | Slide Deck & Demo       | Bank Transfer Gateway    | Loan Amortization &     | PyTest Integration API | FastAPI Core Scaffolding|
@@ -251,6 +251,33 @@
 **Epic Goal:** Deliver user-friendly, high-contrast, WCAG 2.1 accessible interfaces mapped to backend APIs.
 
 ---
+
+#### Ticket ID: `SACCO-116`
+* **Summary:** Configure React Router DOM Navigation Matrix & Protected Routes (<App />)
+* **Type:** Task | **Story Points:** 5 | **Priority:** High | **Status:** **TO DO (Sprint 2)**
+* **Assignee:** Nyeliep Nial / Roy | **Target Branch:** `feature/frontend`
+* **Current State:** `frontend/src/App.jsx` contains Vite's default starter template (counter button, Vite/React logos).
+* **Next Steps & Implementation Notes:**
+  * Replace `frontend/src/App.jsx` with declarative React Router DOM (`BrowserRouter`, `Routes`, `Route`, `Navigate`).
+  * Wire the following URL paths to page components:
+    * `/login` -> User Login & Registration (`<LoginPage />`)
+    * `/dashboard` -> Protected Member & Admin Dashboard (`<ProtectedRoute><Dashboard /></ProtectedRoute>`)
+    * `/loans/apply` -> Protected Member Loan Application Modal/Page (`<ProtectedRoute role="member"><LoanApplication /></ProtectedRoute>`)
+    * `/admin/loans` -> Protected Treasurer Loan Vetting Queue (`<ProtectedRoute role="treasurer"><LoanApproval /></ProtectedRoute>`)
+    * `/admin/audit` -> Protected Immutable Audit Statements View (`<ProtectedRoute role="treasurer"><AuditStatements /></ProtectedRoute>`)
+    * `*` -> Wildcard fallback redirecting to `/dashboard` or `/login`.
+* **Acceptance Criteria (Gherkin):**
+  ```gherkin
+  Scenario: Unauthenticated visitor route protection
+    Given an unauthenticated visitor with no active JWT session token
+    When they navigate directly to "/dashboard" or "/loans/apply"
+    Then ProtectedRoute intercepts the request and redirects them to "/login"
+
+  Scenario: Authenticated member navigates to loan application
+    Given an authenticated member with role="member"
+    When they navigate to "/loans/apply"
+    Then the LoanApplication wizard view is rendered successfully
+  ```
 
 #### Ticket ID: `SACCO-115`
 * **Summary:** Deliver High-Fidelity interactive Figma prototype for core user journeys
