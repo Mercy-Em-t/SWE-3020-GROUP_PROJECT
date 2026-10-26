@@ -3,7 +3,12 @@
 **System:** Sacco Digital Savings Tracker API  
 **Course:** SWE3020B – Software Quality Assurance and Security (USIU-Africa)  
 **Governing Standards:** IEEE 42010:2022 (Architecture Description), ISO/IEC 25010:2023 (Systems & Software Quality), RFC 2119  
-**Lead System Architect & Backend Engineer:** Mercy Tryphen (674748)  
+**Engineering Team:**
+* **Mercy Tryphen** – System Architecture & Backend Infrastructure
+* **Jescah Otwoma** – API Contracts & Payment Gateways
+* **Nyeliep Nial** – Frontend UI/UX Design & Client Architecture
+* **Tayak Ruai** – Software Quality Assurance & Test Engineering
+* **Roy Githaiga** – Client Integration & Agile Scrum Facilitator
 **Document Version:** 1.0.0 (Release Candidate – CAT 2 Evaluation)  
 
 ---

@@ -4,7 +4,12 @@
 **Course:** SWE3020B – Software Quality Assurance and Security (USIU-Africa)  
 **Governing Standards:** ISO/IEC 25010:2023 (Security & Fault Tolerance), RFC 7807 (Problem Details for HTTP APIs)  
 **Deliverable:** CAT 2 Backend Engineering Specification (Stage 2)  
-**Lead System Architect & Backend Lead:** Mercy Tryphen (674748)  
+**Engineering Team:**
+* **Mercy Tryphen** – System Architecture & Backend Infrastructure
+* **Jescah Otwoma** – API Contracts & Payment Gateways
+* **Nyeliep Nial** – Frontend UI/UX Design & Client Architecture
+* **Tayak Ruai** – Software Quality Assurance & Test Engineering
+* **Roy Githaiga** – Client Integration & Agile Scrum Facilitator  
 
 ---
 

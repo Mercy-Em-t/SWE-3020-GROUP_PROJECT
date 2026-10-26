@@ -1,8 +1,13 @@
 # Stage 3: Domain Entity & Invariant Modeling
 
 **Project:** SACCO Digital Savings Tracker (SWE3020B Quality Assurance & Security)  
-**Lead System Architect & Backend Infrastructure Engineer:** Mercy Tryphen (Student ID: 674748)  
 **Governing Standard:** ISO/IEC 25010:2023, IEEE 730-2014, ACID Relational Integrity  
+**Engineering Team:**
+* **Mercy Tryphen** – System Architecture & Backend Infrastructure
+* **Jescah Otwoma** – API Contracts & Payment Gateways
+* **Nyeliep Nial** – Frontend UI/UX Design & Client Architecture
+* **Tayak Ruai** – Software Quality Assurance & Test Engineering
+* **Roy Githaiga** – Client Integration & Agile Scrum Facilitator  
 **Source Code Reference:** [`app/models/entities.py`](file:///c:/Users/user/Documents/Quality%20assurance/SWE-3020-GROUP_PROJECT/app/models/entities.py)
 
 ---

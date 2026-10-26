@@ -1,8 +1,13 @@
 # Stage 4: Business Logic Isolation & SOLID Mathematical Services
 
 **Project:** SACCO Digital Savings Tracker (SWE3020B Quality Assurance & Security)  
-**Lead System Architect & Backend Infrastructure Engineer:** Mercy Tryphen (Student ID: 674748)  
 **Governing Standard:** ISO/IEC 25010:2023, IEEE 730-2014, SOLID Software Design Principles  
+**Engineering Team:**
+* **Mercy Tryphen** – System Architecture & Backend Infrastructure
+* **Jescah Otwoma** – API Contracts & Payment Gateways
+* **Nyeliep Nial** – Frontend UI/UX Design & Client Architecture
+* **Tayak Ruai** – Software Quality Assurance & Test Engineering
+* **Roy Githaiga** – Client Integration & Agile Scrum Facilitator  
 **Source Code References:**
 * Interfaces: [`app/interfaces/loan_calculator.py`](file:///c:/Users/user/Documents/Quality%20assurance/SWE-3020-GROUP_PROJECT/app/interfaces/loan_calculator.py), [`app/interfaces/payment.py`](file:///c:/Users/user/Documents/Quality%20assurance/SWE-3020-GROUP_PROJECT/app/interfaces/payment.py), [`app/interfaces/repository.py`](file:///c:/Users/user/Documents/Quality%20assurance/SWE-3020-GROUP_PROJECT/app/interfaces/repository.py)
 * Services: [`app/services/loan_service.py`](file:///c:/Users/user/Documents/Quality%20assurance/SWE-3020-GROUP_PROJECT/app/services/loan_service.py), [`app/services/savings_service.py`](file:///c:/Users/user/Documents/Quality%20assurance/SWE-3020-GROUP_PROJECT/app/services/savings_service.py), [`app/services/auth_service.py`](file:///c:/Users/user/Documents/Quality%20assurance/SWE-3020-GROUP_PROJECT/app/services/auth_service.py)
