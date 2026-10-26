@@ -1,0 +1,43 @@
+.shell { display: grid; grid-template-columns: 236px 1fr; min-height: 100vh; }
+
+.side { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 14px; display: flex; flex-direction: column; gap: 20px; }
+.brand-sm { display: flex; align-items: center; gap: 9px; padding: 0 4px; }
+.brand-sm .mark { width: 26px; height: 26px; border-radius: 7px; font-size: 12px; }
+.brand-sm b { font-size: 14px; font-weight: 800; }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav a { display: block; padding: 10px 9px; border-radius: 8px; color: var(--sub); text-decoration: none; font-size: 13px; font-weight: 600; }
+.nav a.active { background: var(--green-dim); color: var(--green); }
+.nav-group { font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--mute); margin: 8px 9px 0; }
+.side-foot { margin-top: auto; border-top: 1px solid var(--line); padding-top: 12px; display: flex; gap: 9px; align-items: center; }
+.avatar { width: 30px; height: 30px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; }
+.who b { display: block; font-size: 12px; }
+.who span { font-size: 11px; color: var(--sub); }
+.link-btn { margin-left: auto; background: none; border: 0; color: var(--sub); font-size: 12px; cursor: pointer; text-decoration: underline; font-family: var(--sans); }
+
+.main { padding: 30px 40px 40px; }
+.pagebar { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.pagebar h1 { font-size: 19px; font-weight: 800; margin: 0; }
+.pagebar .sub { font-size: 12px; color: var(--sub); }
+.pill-btn { margin-left: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 11px; font-size: 12px; color: var(--sub); font-weight: 600; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.card h2 { margin: 0; font-size: 14px; font-weight: 700; }
+.sub-line { font-size: 12px; color: var(--sub); margin-top: 2px; }
+.label { font-size: 12px; color: var(--sub); font-weight: 600; }
+
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+.stat-card b { display: block; margin-top: 4px; font-family: var(--mono); font-size: 22px; }
+
+.ledger { list-style: none; margin: 0; padding: 0; }
+.ledger .row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.ledger .row:last-child { border-bottom: 0; }
+.row-main { flex: 1; min-width: 0; }
+.row-main b { display: block; font-size: 13px; }
+.row-main span { font-size: 11px; color: var(--sub); }
+.row-amt { width: 90px; text-align: right; font-family: var(--mono); font-size: 13px; font-weight: 600; }
+
+.tag { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+.tag-green { background: var(--green-dim); color: var(--green); }
+.tag-amber { background: var(--amber-dim); color: var(--amber); }
+.tag-red { background: var(--red-dim); color: var(--red); }
