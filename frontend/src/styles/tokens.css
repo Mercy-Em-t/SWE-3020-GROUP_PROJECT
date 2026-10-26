@@ -1,0 +1,17 @@
+:root {
+  --bg: #0a0f0d;
+  --panel: #111712;
+  --panel-2: #161d17;
+  --line: #232b25;
+  --ink: #eef2ee;
+  --sub: #8a9690;
+  --mute: #5c6a61;
+  --green: #22c07d;
+  --green-dim: #173226;
+  --amber: #e3a94b;
+  --amber-dim: #332612;
+  --red: #e2634f;
+  --red-dim: #301c17;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'Manrope', system-ui, sans-serif;
+}

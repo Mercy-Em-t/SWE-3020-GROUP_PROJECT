@@ -14,7 +14,9 @@ class MemberRegisterRequest(BaseModel):
 
 
 class MemberLoginRequest(BaseModel):
-    email: str = Field(..., pattern=EMAIL_REGEX)
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
+    identifier: Optional[str] = None
     password: str
 
 

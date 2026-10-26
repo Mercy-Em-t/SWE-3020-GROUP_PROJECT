@@ -1,8 +1,13 @@
 from app.repositories.member_repo import MemberRepository
 from app.repositories.audit_repo import AuditRepository
 from app.models.entities import Member
-from app.schemas.member import MemberRegisterRequest, MemberLoginRequest, TokenResponse
+from app.schemas.member import (
+    MemberRegisterRequest,
+    MemberLoginRequest,
+    TokenResponse
+)
 from app.core.security import hash_password, verify_password, create_access_token
+
 
 class AuthService:
     def __init__(self, member_repo: MemberRepository, audit_repo: AuditRepository):
@@ -23,7 +28,7 @@ class AuthService:
             hashed_password=hash_password(request.password)
         )
         created_member = self.member_repo.create_with_account(member)
-        
+
         self.audit_repo.log_event(
             actor_email=created_member.email,
             action="MEMBER_REGISTERED",
@@ -34,7 +39,16 @@ class AuthService:
         return created_member
 
     def authenticate_member(self, request: MemberLoginRequest) -> TokenResponse:
-        member = self.member_repo.get_by_email(request.email)
+        member = None
+        if request.email:
+            member = self.member_repo.get_by_email(request.email)
+        elif request.phone_number:
+            member = self.member_repo.get_by_phone(request.phone_number)
+        elif request.identifier:
+            member = self.member_repo.get_by_email(request.identifier)
+            if not member:
+                member = self.member_repo.get_by_phone(request.identifier)
+
         if not member or not verify_password(request.password, member.hashed_password):
             raise ValueError("Invalid email or password.")
 

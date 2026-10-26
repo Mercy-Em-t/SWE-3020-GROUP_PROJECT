@@ -25,12 +25,21 @@
 
 ---
 
-## 2. System Architecture & SOLID Compliance
+## 2. Reverse-Engineered Architecture & 5-Stage Methodology
+
+The backend was reverse-engineered directly from the frontend prototypes and business requirements across a rigorous 5-stage architectural pipeline:
+
+* 📘 **Master Architecture Guide:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
+* 📑 **Stage 1: UI Deconstruction & Traceability:** [`docs/STAGE_1_UI_DECONSTRUCTION_AND_TRACEABILITY.md`](docs/STAGE_1_UI_DECONSTRUCTION_AND_TRACEABILITY.md)
+* 🛡️ **Stage 2: Boundary Schema Contracts:** [`docs/STAGE_2_BOUNDARY_SCHEMAS_AND_VALIDATION.md`](docs/STAGE_2_BOUNDARY_SCHEMAS_AND_VALIDATION.md)
+* 🗄️ **Stage 3: Domain Entity & Invariant Modeling:** [`docs/STAGE_3_DOMAIN_ENTITY_AND_INVARIANT_MODELING.md`](docs/STAGE_3_DOMAIN_ENTITY_AND_INVARIANT_MODELING.md)
+* ⚙️ **Stage 4: Business Logic Isolation & SOLID:** [`docs/STAGE_4_BUSINESS_LOGIC_ISOLATION_AND_SOLID.md`](docs/STAGE_4_BUSINESS_LOGIC_ISOLATION_AND_SOLID.md)
+* 🚀 **Stage 5: API Composition & Verification:** [`docs/STAGE_5_API_COMPOSITION_AND_VERIFICATION.md`](docs/STAGE_5_API_COMPOSITION_AND_VERIFICATION.md)
 
 ```mermaid
 flowchart TD
-    Client["Client / Swagger UI (/docs)"] --> API["API Layer (app/api/v1)\n- Auth, Savings, Loans, Audit"]
-    API --> Service["Service Layer (app/services)\n- LoanCalculationService (SRP)\n- SavingsLedgerService (DIP)"]
+    Client["Client / Swagger UI (/docs)"] --> API["API Layer (app/api/v1)\n- Auth, Savings, Loans, Members, Audit"]
+    API --> Service["Service Layer (app/services)\n- LoanCalculationService (SRP)\n- SavingsLedgerService (DIP)\n- AuthService"]
     Service --> Gateway["Gateway Strategy (app/gateways)\n- IPaymentGateway (OCP/LSP)\n- MpesaDarajaGateway, BankTransferGateway"]
     Service --> Repo["Repository Layer (app/repositories)\n- MemberRepo, LedgerRepo, LoanRepo, AuditRepo"]
     Repo --> DB[("Database (PostgreSQL / SQLite via SQLAlchemy)")]
