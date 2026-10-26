@@ -31,5 +31,7 @@ jobs:
           flake8 app tests --count --statistics
 
       - name: Execute PyTest Automated Test Suite with Coverage
+        env:
+          PYTHONPATH: .
         run: |
           pytest -v --durations=10
