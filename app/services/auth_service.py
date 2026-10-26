@@ -38,16 +38,30 @@ class AuthService:
         )
         return created_member
 
+    def _find_member_by_phone(self, phone: str):
+        clean = phone.replace(" ", "").replace("-", "")
+        m = self.member_repo.get_by_phone(clean)
+        if not m and clean.startswith("0"):
+            m = self.member_repo.get_by_phone("+254" + clean[1:])
+        elif not m and clean.startswith("+254"):
+            m = self.member_repo.get_by_phone("0" + clean[4:])
+        return m
+
     def authenticate_member(self, request: MemberLoginRequest) -> TokenResponse:
         member = None
         if request.email:
             member = self.member_repo.get_by_email(request.email)
         elif request.phone_number:
-            member = self.member_repo.get_by_phone(request.phone_number)
+            member = self._find_member_by_phone(request.phone_number)
+            if not member and "@" in request.phone_number:
+                member = self.member_repo.get_by_email(request.phone_number)
         elif request.identifier:
-            member = self.member_repo.get_by_email(request.identifier)
-            if not member:
-                member = self.member_repo.get_by_phone(request.identifier)
+            if "@" in request.identifier:
+                member = self.member_repo.get_by_email(request.identifier)
+            else:
+                member = self._find_member_by_phone(request.identifier)
+                if not member:
+                    member = self.member_repo.get_by_email(request.identifier)
 
         if not member or not verify_password(request.password, member.hashed_password):
             raise ValueError("Invalid email or password.")

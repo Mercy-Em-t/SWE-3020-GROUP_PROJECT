@@ -1,9 +1,10 @@
 import { api } from './client.js'
 
 export async function login({ phone, email, password }) {
+  const cleanPhone = phone ? phone.replace(/\s+/g, '') : null
   const payload = email
     ? { email, password }
-    : { phone_number: phone, password }
+    : { phone_number: cleanPhone, password }
 
   const data = await api('/auth/login', {
     method: 'POST',
