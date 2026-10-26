@@ -19,6 +19,10 @@ export async function register(userData) {
   })
 }
 
+export async function getProfile() {
+  return await api('/auth/me')
+}
+
 export function logout() {
   localStorage.removeItem('token')
   localStorage.removeItem('user')

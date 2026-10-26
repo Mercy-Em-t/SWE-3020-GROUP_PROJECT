@@ -4,6 +4,7 @@ from typing import Optional
 
 EMAIL_REGEX = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
 
+
 class MemberRegisterRequest(BaseModel):
     email: str = Field(..., pattern=EMAIL_REGEX)
     full_name: str = Field(..., min_length=2, max_length=150)
@@ -11,9 +12,11 @@ class MemberRegisterRequest(BaseModel):
     password: str = Field(..., min_length=6)
     role: Optional[str] = "member"
 
+
 class MemberLoginRequest(BaseModel):
     email: str = Field(..., pattern=EMAIL_REGEX)
     password: str
+
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -21,6 +24,7 @@ class TokenResponse(BaseModel):
     role: str
     email: str
     member_id: int
+
 
 class MemberResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -30,4 +34,17 @@ class MemberResponse(BaseModel):
     full_name: str
     phone_number: str
     role: str
+    created_at: datetime
+
+
+class MemberDetailResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    email: str
+    full_name: str
+    phone_number: str
+    role: str
+    total_savings: float = 0.0
+    total_shares: float = 0.0
     created_at: datetime

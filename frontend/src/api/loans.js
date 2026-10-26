@@ -11,6 +11,20 @@ export async function applyForLoan(loanData) {
   })
 }
 
+export async function getPendingLoans() {
+  return await api('/loans/pending')
+}
+
+export async function vetLoan(loanId, decision, reviewNotes = '') {
+  return await api(`/loans/${loanId}/vet`, {
+    method: 'POST',
+    body: JSON.stringify({
+      status: decision,
+      review_notes: reviewNotes
+    })
+  })
+}
+
 export async function repayLoan(loanId, amount, reference = 'WEB_REPAY') {
   return await api('/loans/repay', {
     method: 'POST',

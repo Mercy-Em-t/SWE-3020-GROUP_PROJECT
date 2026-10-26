@@ -4,9 +4,11 @@ def test_full_member_savings_and_loan_journey(client):
     1. Member registration & authentication (FR-01)
     2. Savings deposit via M-Pesa (FR-02, FR-03)
     3. Checking borrowing limit (FR-04)
-    4. Applying for loan with guarantor (FR-05, FR-06)
-    5. Loan repayment (FR-07)
-    6. Audit trail verification (FR-10)
+    4. Applying for loan with guarantor -> PENDING (FR-05, FR-06)
+    5. Admin vetting and approval -> APPROVED (Admin Portal)
+    6. Loan repayment (FR-07)
+    7. Member directory listing (FR-08)
+    8. Audit trail verification (FR-10)
     """
     # 1. Register Member
     reg_res = client.post("/api/v1/auth/register", json={
@@ -37,7 +39,17 @@ def test_full_member_savings_and_loan_journey(client):
         "password": "SecurePassword123!"
     })
     assert login_res.status_code == 200
-    assert "access_token" in login_res.json()
+    login_data = login_res.json()
+    assert "access_token" in login_data
+    token = login_data["access_token"]
+
+    # Verify Profile via /auth/me
+    me_res = client.get(
+        "/api/v1/auth/me",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert me_res.status_code == 200
+    assert me_res.json()["email"] == "mercy@sacco.test"
 
     # 3. Make Deposit (KES 20,000)
     dep_res = client.post("/api/v1/savings/deposit", json={
@@ -77,11 +89,24 @@ def test_full_member_savings_and_loan_journey(client):
     assert loan_apply_res.status_code == 201
     loan_data = loan_apply_res.json()
     loan_id = loan_data["id"]
-    assert loan_data["status"] == "APPROVED"
+    assert loan_data["status"] == "PENDING"
     assert loan_data["principal_amount"] == 45000.0
-    assert loan_data["total_repayable"] > 45000.0
 
-    # 6. Apply Loan Repayment
+    # 6. Admin checks pending loans queue
+    pending_res = client.get("/api/v1/loans/pending")
+    assert pending_res.status_code == 200
+    pending_ids = [pl["id"] for pl in pending_res.json()]
+    assert loan_id in pending_ids
+
+    # 7. Admin vets and approves the loan
+    vet_res = client.post(f"/api/v1/loans/{loan_id}/vet", json={
+        "status": "APPROVED",
+        "review_notes": "All guarantor commitments verified against shares."
+    })
+    assert vet_res.status_code == 200
+    assert vet_res.json()["status"] == "APPROVED"
+
+    # 8. Apply Loan Repayment
     repay_res = client.post("/api/v1/loans/repay", json={
         "loan_id": loan_id,
         "amount": 10000.0,
@@ -89,15 +114,28 @@ def test_full_member_savings_and_loan_journey(client):
     })
     assert repay_res.status_code == 200
     repaid_data = repay_res.json()
-    assert repaid_data["balance_outstanding"] == loan_data["total_repayable"] - 10000.0
+    assert repaid_data["balance_outstanding"] == (
+        loan_data["total_repayable"] - 10000.0
+    )
 
-    # 7. Verify Audit Trail Journal
+    # 9. Admin checks member directory
+    members_res = client.get("/api/v1/members")
+    assert members_res.status_code == 200
+    members_list = members_res.json()
+    assert len(members_list) >= 2
+    mercy_entry = next(
+        m for m in members_list if m["email"] == "mercy@sacco.test"
+    )
+    assert mercy_entry["total_savings"] == 20000.0
+
+    # 10. Verify Audit Trail Journal
     audit_res = client.get("/api/v1/audit/logs")
     assert audit_res.status_code == 200
     logs = audit_res.json()
-    assert len(logs) >= 4
+    assert len(logs) >= 5
     actions = [log["action"] for log in logs]
     assert "MEMBER_REGISTERED" in actions
     assert "DEPOSIT_COMPLETED" in actions
+    assert "LOAN_SUBMITTED" in actions
     assert "LOAN_APPROVED" in actions
     assert "LOAN_REPAYMENT_APPLIED" in actions
