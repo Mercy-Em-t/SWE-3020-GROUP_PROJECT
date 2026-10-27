@@ -1,14 +1,13 @@
-// MOCK AUTH. 
+// MOCK AUTH. Replace the bodies with real calls to the FastAPI backend
+// (for example POST /api/auth/login) once the endpoints are confirmed.
+// Demo: a phone number ending in 000 logs in as an admin/treasurer.
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const NAMES_KEY = 'mock_names'
-const normalize = (phone) => phone.replace(/\s/g, '')
-
-function getNames() {
+export function currentUser() {
   try {
-    return JSON.parse(localStorage.getItem(NAMES_KEY)) || {}
+    return JSON.parse(localStorage.getItem('user'))
   } catch {
-    return {}
+    return null
   }
 }
 
@@ -17,12 +16,10 @@ export async function login({ phone, password }) {
   if (!phone.trim() || !password) {
     throw new Error('Enter your phone number and password.')
   }
-  const key = normalize(phone)
-  const isAdmin = key.endsWith('000')
-  const role = isAdmin ? 'admin' : 'member'
-  const name = getNames()[key] || (isAdmin ? 'Admin' : 'Member')
-
-  const user = { name, role }
+  const isAdmin = phone.replace(/\s/g, '').endsWith('000')
+  const user = isAdmin
+    ? { name: 'Grace Achieng', role: 'admin' }
+    : { name: 'Peter Otieno', role: 'member' }
   localStorage.setItem('user', JSON.stringify(user))
   return user
 }
@@ -32,8 +29,9 @@ export async function register(data) {
   if (data.password.length < 8) {
     throw new Error('Password must be at least 8 characters.')
   }
-  const names = getNames()
-  names[normalize(data.phone)] = data.name // match your form's field name
-  localStorage.setItem(NAMES_KEY, JSON.stringify(names))
   return { ok: true }
+}
+
+export function logout() {
+  localStorage.removeItem('user')
 }
