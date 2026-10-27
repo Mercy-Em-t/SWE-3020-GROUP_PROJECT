@@ -3,8 +3,22 @@ name: Sacco Backend SQA CI Pipeline
 on:
   push:
     branches: [ main, develop, feature/* ]
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - 'requirements.txt'
+      - 'pytest.ini'
+      - '.flake8'
+      - '.github/workflows/backend-ci.yml'
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - 'requirements.txt'
+      - 'pytest.ini'
+      - '.flake8'
+      - '.github/workflows/backend-ci.yml'
 
 jobs:
   sqa-verification:
