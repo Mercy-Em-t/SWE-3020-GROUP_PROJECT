@@ -95,7 +95,6 @@ cd frontend
 npm install
 npm run dev        # http://localhost:5173
 ```
-**Demo mode:** the screens currently use placeholder data and a mock login. Any phone number and password logs in as a member; a phone number ending in `000` logs in as a treasurer. Connecting each screen to the FastAPI endpoints is in progress, starting with login.
 
 ### Frontend Tests
 ```bash
