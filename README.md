@@ -19,18 +19,27 @@
 | :--- | :--- | :--- |
 | **Mercy Tryphen (Lead)** | 674748 | System Architecture, Database Schema Engineering, FastAPI Scaffolding, GitHub Actions CI/CD Pipeline. |
 | **Jescah Otwoma** | 673748 | RESTful API Development, Payment Gateway Strategy Integration (M-Pesa Daraja), Financial Ledger Invariants. |
-| **Nyeliep Nial** | 673176 | Figma High-Fidelity UI/UX Prototyping, Usability Engineering (WCAG 2.1), Component Specifications. |
+| **Nyeliep Nial** | 673176 | Figma High-Fidelity UI/UX Prototyping, Usability Engineering (WCAG 2.1), React Frontend Implementation & Component Specifications. |
 | **Tayak Ruai** | 671649 | Quality Assurance Strategy, PyTest Unit & Integration Test Automation, Formal Use Case Modeling. |
 | **Roy** | – | Client State Management, API Integration Protocols, Jira Agile Facilitation, Wednesday Presentation. |
 
 ---
 
-## 2. System Architecture & SOLID Compliance
+## 2. Reverse-Engineered Architecture & 5-Stage Methodology
+
+The backend was reverse-engineered directly from the frontend prototypes and business requirements across a rigorous 5-stage architectural pipeline:
+
+* 📘 **Master Architecture Guide:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
+* 📑 **Stage 1: UI Deconstruction & Traceability:** [`docs/STAGE_1_UI_DECONSTRUCTION_AND_TRACEABILITY.md`](docs/STAGE_1_UI_DECONSTRUCTION_AND_TRACEABILITY.md)
+* 🛡️ **Stage 2: Boundary Schema Contracts:** [`docs/STAGE_2_BOUNDARY_SCHEMAS_AND_VALIDATION.md`](docs/STAGE_2_BOUNDARY_SCHEMAS_AND_VALIDATION.md)
+* 🗄️ **Stage 3: Domain Entity & Invariant Modeling:** [`docs/STAGE_3_DOMAIN_ENTITY_AND_INVARIANT_MODELING.md`](docs/STAGE_3_DOMAIN_ENTITY_AND_INVARIANT_MODELING.md)
+* ⚙️ **Stage 4: Business Logic Isolation & SOLID:** [`docs/STAGE_4_BUSINESS_LOGIC_ISOLATION_AND_SOLID.md`](docs/STAGE_4_BUSINESS_LOGIC_ISOLATION_AND_SOLID.md)
+* 🚀 **Stage 5: API Composition & Verification:** [`docs/STAGE_5_API_COMPOSITION_AND_VERIFICATION.md`](docs/STAGE_5_API_COMPOSITION_AND_VERIFICATION.md)
 
 ```mermaid
 flowchart TD
-    Client["Client / Swagger UI (/docs)"] --> API["API Layer (app/api/v1)\n- Auth, Savings, Loans, Audit"]
-    API --> Service["Service Layer (app/services)\n- LoanCalculationService (SRP)\n- SavingsLedgerService (DIP)"]
+    Client["Client / Swagger UI (/docs)"] --> API["API Layer (app/api/v1)\n- Auth, Savings, Loans, Members, Audit"]
+    API --> Service["Service Layer (app/services)\n- LoanCalculationService (SRP)\n- SavingsLedgerService (DIP)\n- AuthService"]
     Service --> Gateway["Gateway Strategy (app/gateways)\n- IPaymentGateway (OCP/LSP)\n- MpesaDarajaGateway, BankTransferGateway"]
     Service --> Repo["Repository Layer (app/repositories)\n- MemberRepo, LedgerRepo, LoanRepo, AuditRepo"]
     Repo --> DB[("Database (PostgreSQL / SQLite via SQLAlchemy)")]
@@ -45,7 +54,58 @@ flowchart TD
 
 ---
 
-## 3. Quick Start & Local Execution
+## 3. Frontend (React + Vite)
+
+The web client implements the Figma prototype as a React single-page application with role-based screens for **members** and **treasurers/admins**. It lives in the [`frontend/`](frontend/) folder.
+
+| Role | Screens |
+| :--- | :--- |
+| Everyone | Login, Register |
+| Member | Dashboard, Deposits, Savings & Dividends, Loan Application, Statements |
+| Treasurer / Admin | Group Dashboard, Deposits & Reconciliation, Loan Approvals, Member Register, Audit Trail & Statements |
+
+### Frontend Structure
+```
+frontend/src/
+├─ api/          # all backend calls (auth, ...) in one place
+├─ components/   # reusable UI: AppShell, Sidebar, Card, DataTable, StatusTag, Stepper, Meter
+├─ pages/        # auth/, member/, admin/ screens built from the components
+├─ routes/       # ProtectedRoute (role-based page access)
+├─ utils/        # pure logic: loan rules, formatting, validation (unit tested)
+├─ config/       # product name, navigation per role
+├─ data/         # placeholder data, replaced by API calls as endpoints are connected
+└─ styles/       # design tokens (colours, fonts) from the Figma file
+```
+
+* **Modularity & reusability:** pages are composed from shared components, so a change to `DataTable` or `StatusTag` updates every screen.
+* **Separation of concerns (SRP):** business rules such as the 3× shares borrowing limit and guarantor check are pure functions in `utils/loan.js`, kept out of the UI code.
+* **Open/Closed:** `DataTable` takes column definitions, so new columns are added without editing the component.
+* **Dependency inversion:** pages call the `api` module instead of `fetch` directly, so switching from placeholder data to the FastAPI backend does not change the pages.
+* **Role-based access:** `ProtectedRoute` shows members and admins only their own pages. This is a UI convenience; the backend remains responsible for enforcing permissions.
+
+### Accessibility & Usability
+* Every form field has a label, validation errors are announced to screen readers (`role="alert"`), and keyboard focus is visible.
+* Statuses use text labels as well as colour (Matched, Pending, Approved, Rejected).
+* Primary and secondary text meet the WCAG 2.1 AA contrast ratio of 4.5:1.
+* The loan application shows its progress with a stepper (Eligibility → Details → Guarantors → Treasurer review).
+
+### Run the Frontend
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:5173
+```
+**Demo mode:** the screens currently use placeholder data and a mock login. Any phone number and password logs in as a member; a phone number ending in `000` logs in as a treasurer. Connecting each screen to the FastAPI endpoints is in progress, starting with login.
+
+### Frontend Tests
+```bash
+npm test           # Vitest + React Testing Library
+npm run lint
+npm run build
+```
+33 automated tests cover the loan rules (borrowing limit, guarantors), form validation, role-based route protection, loan approve/reject, and a smoke test that every page renders.
+
+## 4. Quick Start & Local Execution
 
 ### Prerequisites
 * Python 3.11+
@@ -71,7 +131,7 @@ uvicorn app.main:app --reload --port 8000
 
 ---
 
-## 4. Quality Assurance & Automated Testing
+## 5. Quality Assurance & Automated Testing
 
 ### Execute the PyTest Suite
 ```bash
@@ -89,7 +149,7 @@ flake8 app tests --count --statistics
 
 ---
 
-## 5. Project Management & Jira Kanban Board
+## 6. Project Management & Jira Kanban Board
 
 The team tracks deliverables using Jira Software across five active stages:
 ```
