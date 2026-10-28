@@ -1,14 +1,24 @@
 # Backend Engineering, SRS & Architectural Master Guide
 **Project:** Sacco Digital Savings Tracker  
 **Course:** SWE3020B – Software Quality Assurance and Security (USIU-Africa)  
-**Lead Backend Engineer:** Mercy Tryphen (674748)  
+**Engineering Team:**
+* **Mercy Tryphen** – System Architecture & Backend Infrastructure
+* **Jescah Otwoma** – API Contracts & Payment Gateways
+* **Nyeliep Nial** – Frontend UI/UX Design & Client Architecture
+* **Tayak Ruai** – Software Quality Assurance & Test Engineering
+* **Roy Githaiga** – Client Integration & Agile Scrum Facilitator
 **Deliverable:** CAT 2 Project Evaluation & System Documentation (30 Marks)  
 
 ---
 
 ## 1. Backend Engineer Role & Rubric Ownership Matrix
 
-As the **Lead Backend Engineer & System Architect**, your technical contributions directly fulfill and secure the core of the **30-Mark CAT 2 Rubric**:
+**Engineering Team:**
+* **Mercy Tryphen** – System Architecture & Backend Infrastructure
+* **Jescah Otwoma** – API Contracts & Payment Gateways
+* **Nyeliep Nial** – Frontend UI/UX Design & Client Architecture
+* **Tayak Ruai** – Software Quality Assurance & Test Engineering
+* **Roy Githaiga** – Client Integration & Agile Scrum Facilitator
 
 ```mermaid
 pie title CAT 2 Marks Direct Backend Ownership
@@ -273,7 +283,12 @@ export async function submitDeposit(memberId, amount, phoneNumber) {
 
 ## 7. How to Present Your Work in the Wednesday Evaluation (Speaking Script)
 
-When it's your turn to speak as the **Lead Backend Engineer**:
+**Engineering Team:**
+* **Mercy Tryphen** – System Architecture & Backend Infrastructure
+* **Jescah Otwoma** – API Contracts & Payment Gateways
+* **Nyeliep Nial** – Frontend UI/UX Design & Client Architecture
+* **Tayak Ruai** – Software Quality Assurance & Test Engineering
+* **Roy Githaiga** – Client Integration & Agile Scrum Facilitator
 
 1. **Your Opening Statement (30 seconds):**
    > *"Good morning Prof. Eunice and team. I led the backend engineering and system architecture for the Sacco Digital Savings Tracker. My goal was to engineer a fault-tolerant, mathematically verifiable financial core that solves the informal SACCO trust deficit using modern software quality assurance and SOLID design principles."*

@@ -3,8 +3,22 @@ name: Sacco Backend SQA CI Pipeline
 on:
   push:
     branches: [ main, develop, feature/* ]
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - 'requirements.txt'
+      - 'pytest.ini'
+      - '.flake8'
+      - '.github/workflows/backend-ci.yml'
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - 'requirements.txt'
+      - 'pytest.ini'
+      - '.flake8'
+      - '.github/workflows/backend-ci.yml'
 
 jobs:
   sqa-verification:
@@ -31,5 +45,7 @@ jobs:
           flake8 app tests --count --statistics
 
       - name: Execute PyTest Automated Test Suite with Coverage
+        env:
+          PYTHONPATH: .
         run: |
           pytest -v --durations=10
