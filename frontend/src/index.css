@@ -1,0 +1,9 @@
+@import './styles/tokens.css';
+@import './styles/auth.css';
+@import './styles/app.css';
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+a { color: inherit; }
+/* Visible keyboard focus (WCAG 2.1 AA) */
+:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }

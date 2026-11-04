@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  sacco-api:
+    build: .
+    container_name: sacco_savings_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./sacco_tracker.db
+      - SECRET_KEY=sacco-super-secret-key-3020b
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
