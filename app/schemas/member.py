@@ -6,11 +6,53 @@ EMAIL_REGEX = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
 
 
 class MemberRegisterRequest(BaseModel):
-    email: str = Field(..., pattern=EMAIL_REGEX)
+    email: str = Field(
+        ...,
+        pattern=EMAIL_REGEX,
+        examples=["mercy@sacco.org"]
+    )
+    full_name: str = Field(
+        ...,
+        min_length=2,
+        max_length=150,
+        examples=["Mercy Emurugat"]
+    )
+    phone_number: str = Field(
+        ...,
+        pattern=r"^\+?[0-9]{10,15}$",
+        examples=["+254712345678"]
+    )
+    password: str = Field(
+        ...,
+        min_length=6,
+        examples=["MemberPass123!"]
+    )
+    # Accepted for backwards compatibility but IGNORED: public self-registration
+    # always creates a plain member. Elevated roles are granted via POST /members (admin only).
+    role: Optional[str] = "member"
+
+
+class AdminMemberCreateRequest(BaseModel):
+    """Admin-initiated onboarding from the Member Register screen."""
     full_name: str = Field(..., min_length=2, max_length=150)
     phone_number: str = Field(..., pattern=r"^\+?[0-9]{10,15}$")
-    password: str = Field(..., min_length=6)
-    role: Optional[str] = "member"
+    email: Optional[str] = Field(None, pattern=EMAIL_REGEX)
+    role: str = Field("member", pattern="^(member|treasurer|admin)$")
+
+
+class AdminMemberCreateResponse(BaseModel):
+    id: int
+    email: str
+    full_name: str
+    phone_number: str
+    role: str
+    temporary_password: str
+
+
+class MemberDirectoryEntry(BaseModel):
+    """Minimal public directory entry (no balances) used for guarantor selection."""
+    id: int
+    full_name: str
 
 
 class MemberLoginRequest(BaseModel):
@@ -26,6 +68,7 @@ class TokenResponse(BaseModel):
     role: str
     email: str
     member_id: int
+    full_name: Optional[str] = None
 
 
 class MemberResponse(BaseModel):

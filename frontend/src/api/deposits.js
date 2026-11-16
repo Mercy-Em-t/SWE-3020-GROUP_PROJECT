@@ -19,3 +19,11 @@ export async function getSavingsSummary(memberId) {
 export async function getLedgerJournal(memberId) {
   return await api(`/savings/ledger/${memberId}`)
 }
+
+export async function getAllTransactions(limit = 100) {
+  return await api(`/savings/transactions?limit=${limit}`)
+}
+
+export async function getGroupSummary() {
+  return await api('/savings/summary')
+}

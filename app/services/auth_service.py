@@ -1,10 +1,13 @@
+import secrets
 from app.repositories.member_repo import MemberRepository
 from app.repositories.audit_repo import AuditRepository
-from app.models.entities import Member
+from app.models.entities import Member, UserRole
 from app.schemas.member import (
     MemberRegisterRequest,
     MemberLoginRequest,
-    TokenResponse
+    TokenResponse,
+    AdminMemberCreateRequest,
+    AdminMemberCreateResponse
 )
 from app.core.security import hash_password, verify_password, create_access_token
 
@@ -14,17 +17,22 @@ class AuthService:
         self.member_repo = member_repo
         self.audit_repo = audit_repo
 
-    def register_member(self, request: MemberRegisterRequest) -> Member:
-        if self.member_repo.get_by_email(request.email):
-            raise ValueError(f"Email {request.email} is already registered.")
-        if self.member_repo.get_by_phone(request.phone_number):
-            raise ValueError(f"Phone number {request.phone_number} is already in use.")
+    def _ensure_unique(self, email: str, phone_number: str) -> None:
+        if self.member_repo.get_by_email(email):
+            raise ValueError(f"Email {email} is already registered.")
+        if self.member_repo.get_by_phone(phone_number):
+            raise ValueError(f"Phone number {phone_number} is already in use.")
 
+    def register_member(self, request: MemberRegisterRequest) -> Member:
+        self._ensure_unique(request.email, request.phone_number)
+
+        # Privilege-escalation guard: public self-registration can never
+        # create an admin/treasurer, whatever the client sends in `role`.
         member = Member(
             email=request.email,
             full_name=request.full_name,
             phone_number=request.phone_number,
-            role=request.role or "member",
+            role=UserRole.MEMBER.value,
             hashed_password=hash_password(request.password)
         )
         created_member = self.member_repo.create_with_account(member)
@@ -37,6 +45,40 @@ class AuthService:
             delta=f"Role: {created_member.role}"
         )
         return created_member
+
+    def admin_create_member(
+        self, request: AdminMemberCreateRequest, actor_email: str
+    ) -> AdminMemberCreateResponse:
+        """Admin onboarding: may assign roles; issues a one-time temporary password."""
+        digits = "".join(ch for ch in request.phone_number if ch.isdigit())
+        email = request.email or f"{digits}@sacco.internal"
+        self._ensure_unique(email, request.phone_number)
+
+        temporary_password = secrets.token_urlsafe(9)
+        member = Member(
+            email=email,
+            full_name=request.full_name,
+            phone_number=request.phone_number,
+            role=request.role,
+            hashed_password=hash_password(temporary_password)
+        )
+        created = self.member_repo.create_with_account(member)
+
+        self.audit_repo.log_event(
+            actor_email=actor_email,
+            action="MEMBER_ONBOARDED",
+            entity_name="Member",
+            entity_id=created.id,
+            delta=f"Role: {created.role}"
+        )
+        return AdminMemberCreateResponse(
+            id=created.id,
+            email=created.email,
+            full_name=created.full_name,
+            phone_number=created.phone_number,
+            role=created.role,
+            temporary_password=temporary_password
+        )
 
     def _find_member_by_phone(self, phone: str):
         clean = phone.replace(" ", "").replace("-", "")
@@ -83,5 +125,6 @@ class AuthService:
             access_token=token,
             role=member.role,
             email=member.email,
-            member_id=member.id
+            member_id=member.id,
+            full_name=member.full_name
         )

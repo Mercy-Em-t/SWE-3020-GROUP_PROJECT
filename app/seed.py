@@ -19,7 +19,7 @@ def seed_database():
     # 1. Admin / Treasurer
     admin = Member(
         email="treasurer@sacco.org",
-        full_name="Prof. Eunice (Treasurer Admin)",
+        full_name="Grace Achieng (Treasurer Admin)",
         phone_number="+254700111222",
         role="treasurer",
         hashed_password=hash_password("AdminSecure123!")

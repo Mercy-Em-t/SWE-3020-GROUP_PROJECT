@@ -15,6 +15,10 @@ export async function getPendingLoans() {
   return await api('/loans/pending')
 }
 
+export async function getAllLoans(limit = 100) {
+  return await api(`/loans?limit=${limit}`)
+}
+
 export async function vetLoan(loanId, decision, reviewNotes = '') {
   return await api(`/loans/${loanId}/vet`, {
     method: 'POST',

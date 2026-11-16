@@ -28,6 +28,15 @@
 
 .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
 .stat-card b { display: block; margin-top: 4px; font-family: var(--mono); font-size: 22px; }
+.stat-card-link {
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+.stat-card-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent, #10b981);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
 
 .ledger { list-style: none; margin: 0; padding: 0; }
 .ledger .row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13px; }

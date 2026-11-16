@@ -91,13 +91,33 @@ def get_current_user(
     return member
 
 
+ADMIN_ROLES = (UserRole.ADMIN.value, UserRole.TREASURER.value)
+
+
+def is_admin(member: Member) -> bool:
+    """True when the member holds an administrative (admin/treasurer) role."""
+    return member.role in ADMIN_ROLES
+
+
 def get_current_admin(
     current_user: Member = Depends(get_current_user)
 ) -> Member:
     """Require administrator or treasurer role."""
-    if current_user.role not in [UserRole.ADMIN.value, UserRole.TREASURER.value]:
+    if not is_admin(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrative privilege required."
         )
     return current_user
+
+
+def ensure_self_or_admin(member_id: int, current_user: Member) -> None:
+    """
+    Object-level authorization (OWASP API1: BOLA):
+    members may only touch their own records; admins/treasurers may access any.
+    """
+    if current_user.id != member_id and not is_admin(current_user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You may only access your own account."
+        )

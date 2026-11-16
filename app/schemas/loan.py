@@ -49,3 +49,6 @@ class LoanResponse(BaseModel):
     status: str
     created_at: datetime
     due_date: datetime
+    # Enriched read-model fields for the admin approval queue / member views
+    borrower_name: Optional[str] = None
+    guarantor_count: int = 0

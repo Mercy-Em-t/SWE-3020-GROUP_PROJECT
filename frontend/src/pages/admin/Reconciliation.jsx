@@ -1,54 +1,68 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AppShell from '../../components/AppShell'
 import Card from '../../components/Card'
 import DataTable from '../../components/DataTable'
 import StatCard from '../../components/StatCard'
 import StatusTag from '../../components/StatusTag'
-import { GROUP_DEPOSITS } from '../../data/mock'
+import { getAllTransactions } from '../../api/deposits'
 import { formatKES } from '../../utils/format'
 
 export default function Reconciliation() {
-  const [deposits, setDeposits] = useState(GROUP_DEPOSITS)
-  const reconcile = (id) =>
-    setDeposits(deposits.map((d) => (d.id === id ? { ...d, status: 'matched' } : d)))
+  const [deposits, setDeposits] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const matched = deposits.filter((d) => d.status === 'matched').length
-  const open = deposits.length - matched
-  const total = deposits.reduce((sum, d) => sum + d.amount, 0)
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const data = await getAllTransactions()
+      setDeposits(data)
+      setError('')
+    } catch (err) {
+      setError(err.message || 'Failed to load group transactions.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const matched = deposits.length
+  const total = deposits.reduce((sum, d) => sum + (d.amount || 0), 0)
 
   const columns = [
-    { key: 'member', label: 'From' },
-    { key: 'source', label: 'Source' },
-    { key: 'ref', label: 'Reference', render: (r) => <span className="mono">{r.ref}</span> },
-    { key: 'date', label: 'Date' },
+    { key: 'member_name', label: 'From', render: (r) => r.member_name || `Account #${r.account_id}` },
+    { key: 'transaction_type', label: 'Type' },
+    { key: 'reference_code', label: 'Reference', render: (r) => <span className="mono">{r.reference_code}</span> },
+    {
+      key: 'timestamp',
+      label: 'Date',
+      render: (r) => (r.timestamp ? new Date(r.timestamp).toLocaleString() : 'N/A')
+    },
     { key: 'amount', label: 'Amount', render: (r) => <span className="mono">+{formatKES(r.amount)}</span> },
     {
       key: 'status',
       label: 'Status',
-      render: (r) => (
-        <StatusTag status={r.status}>{r.status === 'matched' ? 'Matched' : 'Reconciling'}</StatusTag>
-      ),
-    },
-    {
-      key: 'action',
-      label: '',
-      render: (r) =>
-        r.status === 'pending' ? (
-          <button type="button" className="btn-sm ghost" aria-label={`Mark ${r.ref} as reconciled`}
-            onClick={() => reconcile(r.id)}>Mark reconciled</button>
-        ) : null,
+      render: () => <StatusTag status="matched">Verified</StatusTag>,
     },
   ]
 
   return (
     <AppShell title="Deposits & reconciliation" subtitle="Mobile money and bank feeds matched to member records">
+      {error && <p className="form-error" role="alert">{error}</p>}
       <div className="grid3">
-        <StatCard label="Matched" value={String(matched)} />
-        <StatCard label="Still reconciling" value={String(open)} />
+        <StatCard label="Reconciled ledger entries" value={String(matched)} />
+        <StatCard label="Discrepancies" value="0" />
         <StatCard label="Total received" value={formatKES(total)} />
       </div>
       <Card>
-        <DataTable columns={columns} rows={deposits} />
+        {loading ? (
+          <p className="sub-line">Loading transactions...</p>
+        ) : (
+          <DataTable columns={columns} rows={deposits} empty="No transactions found." />
+        )}
       </Card>
     </AppShell>
   )

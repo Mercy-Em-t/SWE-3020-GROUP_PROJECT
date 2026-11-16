@@ -42,3 +42,8 @@ class LedgerRepository(BaseRepository[SavingsAccount]):
             .filter(LedgerTransaction.account_id == account_id)\
             .order_by(LedgerTransaction.timestamp.desc())\
             .limit(limit).all()
+
+    def get_all_transactions(self, limit: int = 100) -> List[LedgerTransaction]:
+        return self.db.query(LedgerTransaction)\
+            .order_by(LedgerTransaction.timestamp.desc())\
+            .limit(limit).all()

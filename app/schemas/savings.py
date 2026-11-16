@@ -37,3 +37,11 @@ class LedgerTransactionResponse(BaseModel):
     reference_code: str
     description: Optional[str]
     timestamp: datetime
+    member_name: Optional[str] = None
+
+
+class GroupFinancialSummary(BaseModel):
+    total_group_savings: float
+    pending_loan_approvals: int
+    total_members: int
+    recent_transactions_count: int

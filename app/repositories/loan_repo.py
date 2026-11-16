@@ -14,6 +14,9 @@ class LoanRepository(BaseRepository[Loan]):
     def get_pending_loans(self) -> List[Loan]:
         return self.db.query(Loan).filter(Loan.status == "PENDING").all()
 
+    def get_all_loans(self, limit: int = 100) -> List[Loan]:
+        return self.db.query(Loan).order_by(Loan.created_at.desc()).limit(limit).all()
+
     def add_guarantor(self, loan_id: int, guarantor_id: int, amount: float) -> GuarantorCommitment:
         commitment = GuarantorCommitment(
             loan_id=loan_id,

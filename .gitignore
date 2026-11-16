@@ -39,3 +39,7 @@ coverage.xml
 .DS_Store
 *.db
 *.sqlite3
+
+# Temp conversion artifacts
+docs/_*_temp_convert_files/
+docs/_temp_convert_files/

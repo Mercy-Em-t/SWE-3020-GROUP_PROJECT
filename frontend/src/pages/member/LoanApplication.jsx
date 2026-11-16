@@ -1,36 +1,94 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AppShell from '../../components/AppShell'
 import Card from '../../components/Card'
 import Meter from '../../components/Meter'
 import Stepper from '../../components/Stepper'
-import { GUARANTORS, MEMBER } from '../../data/mock'
+import { currentUser } from '../../api/auth'
+import { getSavingsSummary } from '../../api/deposits'
+import { getMemberDirectory } from '../../api/members'
+import { applyForLoan } from '../../api/loans'
 import { formatKES } from '../../utils/format'
-import { maxLoan, REQUIRED_GUARANTORS, validateLoan } from '../../utils/loan'
+import { LOAN_MULTIPLIER, REQUIRED_GUARANTORS } from '../../utils/loan'
 
 const STEPS = ['Eligibility check', 'Application details', 'Guarantor sign-off', 'Treasurer review']
-const PURPOSES = ['School fees', 'Business capital', 'Emergency']
+const PURPOSES = ['School fees', 'Business capital', 'Emergency', 'Development']
 const EMPTY = { amount: '', purpose: PURPOSES[0], months: '12', g1: '', g2: '' }
 
 export default function LoanApplication() {
-  const limit = maxLoan(MEMBER.savings, MEMBER.outstanding)
+  const user = currentUser()
+  const [savingsAccount, setSavingsAccount] = useState(null)
+  const [availableGuarantors, setAvailableGuarantors] = useState([])
   const [form, setForm] = useState(EMPTY)
   const [errors, setErrors] = useState([])
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    async function loadPrerequisites() {
+      if (!user.id) return
+      try {
+        const [acct, directory] = await Promise.all([
+          getSavingsSummary(user.id),
+          getMemberDirectory()
+        ])
+        setSavingsAccount(acct)
+        // Filter out self so user cannot vouch for themselves
+        setAvailableGuarantors(directory.filter((m) => m.id !== user.id))
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    loadPrerequisites()
+  }, [user.id])
+
+  const totalShares = savingsAccount?.total_shares || 0
+  const limit = totalShares * LOAN_MULTIPLIER
 
   const set = (field) => (e) => setForm({ ...form, [field]: e.target.value })
   const chosen = [form.g1, form.g2].filter(Boolean).length
   const usage = limit ? (Number(form.amount) / limit) * 100 : 0
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
-    const problems = validateLoan({
-      amount: form.amount,
-      savings: MEMBER.savings,
-      outstanding: MEMBER.outstanding,
-      guarantors: [form.g1, form.g2],
-    })
+    const problems = []
+    const requestedAmount = Number(form.amount)
+
+    if (!requestedAmount || requestedAmount <= 0) {
+      problems.push('Enter the loan amount.')
+    } else if (requestedAmount > limit) {
+      problems.push(`The amount is above your limit of ${formatKES(limit)}.`)
+    }
+
+    if (!form.g1 || !form.g2) {
+      problems.push(`Choose ${REQUIRED_GUARANTORS} guarantors.`)
+    } else if (form.g1 === form.g2) {
+      problems.push('Each guarantor must be a different member.')
+    }
+
     setErrors(problems)
-    if (problems.length === 0) setSubmitted(true)
+    if (problems.length > 0) return
+
+    // Calculate uncollateralized amount to distribute between guarantors
+    const uncollateralized = Math.max(0, requestedAmount - totalShares)
+    const perGuarantor = uncollateralized > 0 ? uncollateralized / 2 : 1000.0
+
+    try {
+      setSubmitting(true)
+      await applyForLoan({
+        member_id: user.id,
+        principal_amount: requestedAmount,
+        duration_months: parseInt(form.months, 10),
+        guarantors: [
+          { guarantor_member_id: parseInt(form.g1, 10), amount_guaranteed: perGuarantor },
+          { guarantor_member_id: parseInt(form.g2, 10), amount_guaranteed: perGuarantor }
+        ]
+      })
+      setSubmitted(true)
+    } catch (err) {
+      setErrors([err.message || 'Loan application failed.'])
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const reset = () => {
@@ -48,7 +106,7 @@ export default function LoanApplication() {
           <span>My eligible amount</span>
           <b>{formatKES(limit)}</b>
           <Meter value={usage} label="Requested amount compared with your limit" />
-          <span>3 times my savings</span>
+          <span>3 times my shares</span>
         </div>
         <div className="loan-box">
           <span>Guarantors chosen</span>
@@ -67,8 +125,8 @@ export default function LoanApplication() {
       {submitted ? (
         <Card title="Application sent">
           <p className="notice" role="status">
-            Your request for {formatKES(form.amount)} was sent. Your guarantors will be asked to
-            sign off, then the treasurer will review it.
+            Your request for {formatKES(form.amount)} was submitted to the ledger. Your guarantors will be notified,
+            then the treasurer will review and disburse it.
           </p>
           <button type="button" className="btn-sm ghost" onClick={reset}>Start another application</button>
         </Card>
@@ -100,14 +158,18 @@ export default function LoanApplication() {
                 <label htmlFor="g1">Guarantor 1</label>
                 <select id="g1" value={form.g1} onChange={set('g1')}>
                   <option value="">Select a member</option>
-                  {GUARANTORS.map((g) => <option key={g}>{g}</option>)}
+                  {availableGuarantors.map((g) => (
+                    <option key={g.id} value={g.id}>{g.full_name}</option>
+                  ))}
                 </select>
               </div>
               <div className="field">
                 <label htmlFor="g2">Guarantor 2</label>
                 <select id="g2" value={form.g2} onChange={set('g2')}>
                   <option value="">Select a member</option>
-                  {GUARANTORS.map((g) => <option key={g}>{g}</option>)}
+                  {availableGuarantors.map((g) => (
+                    <option key={g.id} value={g.id}>{g.full_name}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -118,7 +180,9 @@ export default function LoanApplication() {
               </ul>
             )}
 
-            <button type="submit" className="btn-sm primary">Submit application</button>
+            <button type="submit" className="btn-sm primary" disabled={submitting}>
+              {submitting ? 'Submitting to backend...' : 'Submit application'}
+            </button>
           </form>
         </Card>
       )}
