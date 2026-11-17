@@ -58,7 +58,7 @@ export default function Deposits() {
             </div>
             {error && <p className="form-error" role="alert">{error}</p>}
             <button type="submit" className="btn-sm primary">Send payment prompt</button>
-            <p className="fine-print">Demo only: no real payment is made until the backend is connected.</p>
+            {/* <p className="fine-print">Demo only: no real payment is made until the backend is connected.</p> */}
           </form>
         </Card>
       </div>
